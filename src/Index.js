@@ -1,25 +1,26 @@
+let favoriteCities = [];
+
 function refreshWeather(response) {
-  let temperatureElement = document.querySelector("#temperature");
-  let temperature = response.data.temperature.current;
-  let cityElement = document.querySelector("#city");
-  let descriptionElement = document.querySelector("#description");
-  let humidityElement = document.querySelector("#humidity");
-  let windspeedElement = document.querySelector("#wind-speed");
-  let timeElement = document.querySelector("#time");
-  let date = new Date(response.data.time * 1000);
-  let iconElement = document.querySelector("#icon");
+  const temperatureElement = document.querySelector("#temperature");
+  const cityElement = document.querySelector("#city");
+  const descriptionElement = document.querySelector("#description");
+  const humidityElement = document.querySelector("#humidity");
+  const windspeedElement = document.querySelector("#wind-speed");
+  const timeElement = document.querySelector("#time");
+  const date = new Date(response.data.time * 1000);
+  const iconElement = document.querySelector("#icon");
 
   cityElement.innerHTML = response.data.city;
-
   timeElement.innerHTML = formatDate(date);
   descriptionElement.innerHTML = response.data.condition.description;
-  temperatureElement.innerHTML = Math.round(temperature);
+  temperatureElement.innerHTML = `${Math.round(
+    response.data.temperature.current
+  )}°C`;
   humidityElement.innerHTML = `${response.data.temperature.humidity}%`;
   windspeedElement.innerHTML = `${response.data.wind.speed}km/h`;
-  iconElement.innerHTML = `<img src="${response.data.condition.icon_url}" 
-            class ="weather-app-icon">`;
+  iconElement.innerHTML = `<img src="${response.data.condition.icon_url}" class="weather-app-icon">`;
 
-  let description = response.data.condition.description.toLowerCase();
+  const description = response.data.condition.description.toLowerCase();
   updateBackground(description);
   updateTextColors(description);
   getForecast(response.data.city);
@@ -27,27 +28,22 @@ function refreshWeather(response) {
 
 function updateBackground(description) {
   const body = document.body;
-
   const texture =
     "url('https://www.transparenttextures.com/patterns/old-map.png')";
 
   if (description.includes("clear")) {
-    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #87CEEB, #FFA07A)`; // Clear sky
+    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #87CEEB, #FFA07A)`;
   } else if (
     description.includes("cloud") ||
     description.includes("overcast")
   ) {
-    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #B597F6, #C6F8FF)`; // cloudy
+    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #B597F6, #C6F8FF)`;
   } else if (description.includes("rain") || description.includes("drizzle")) {
-    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #5F9EA0, #A9A9A9)`; // rain
+    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #5F9EA0, #A9A9A9)`;
   } else if (description.includes("snow") || description.includes("sleet")) {
-    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #B0E0E6, #FFFFFF)`; // Snow
+    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #B0E0E6, #FFFFFF)`;
   } else if (description.includes("mist") || description.includes("fog")) {
-    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #696969, #DCDCDC)`; // fog
-  } else {
-    const temperature = parseFloat(
-      document.querySelector("#temperature").textContent
-    );
+    body.style.background = `${texture} no-repeat, linear-gradient(to bottom, #696969, #DCDCDC)`;
   }
 
   body.style.backgroundSize = "150px 150px, cover";
@@ -58,52 +54,62 @@ function updateBackground(description) {
 function updateTextColors(description) {
   const humidityElement = document.querySelector("#humidity");
   const windspeedElement = document.querySelector("#wind-speed");
-  const forecastTemperatures = document.querySelectorAll(
-    ".weather-forecast-temperature"
-  );
-
-  console.log("Forecast Temperatures Found:", forecastTemperatures);
 
   let color;
   if (description.includes("clear")) {
-    color = "#FFA500"; // orange
+    color = "#FFA500";
   } else if (
     description.includes("cloud") ||
     description.includes("overcast")
   ) {
-    color = "#4682B4"; // Teal
+    color = "#4682B4";
   } else if (description.includes("rain") || description.includes("drizzle")) {
-    color = "#5F9EA0"; // Dark blue-green
+    color = "#5F9EA0";
   } else if (description.includes("snow") || description.includes("sleet")) {
-    color = "#87CEFA"; // Light blue
+    color = "#87CEFA";
   } else if (description.includes("mist") || description.includes("fog")) {
-    color = "#DCDCDC"; // Light grey
-  } else {
-    const temperature = parseFloat(
-      document.querySelector("#temperature").textContent
-    );
-    if (temperature > 25) {
-      color = "#FF4500"; // Red-orange
-    } else if (temperature < 0) {
-      color = "#4682B4"; // Dark blue
-    } else {
-      color = "#4A4A4A"; // Grey
-    }
+    color = "#DCDCDC";
   }
 
   humidityElement.style.color = color;
   windspeedElement.style.color = color;
+}
 
-  forecastTemperatures.forEach((temperatureElement) => {
-    console.log("Updating color for:", temperatureElement);
-    temperatureElement.style.color = color;
+function addFavoriteCity() {
+  const cityName = document.querySelector("#city").innerText;
+  const temperature = document.querySelector("#temperature").innerText;
+  const weatherIcon = document.querySelector("#icon img").src;
+
+  if (!favoriteCities.some((city) => city.name === cityName)) {
+    favoriteCities.push({
+      name: cityName,
+      temp: temperature,
+      icon: weatherIcon,
+    });
+    displayFavorites();
+  }
+}
+
+function displayFavorites() {
+  const favoritesContainer = document.querySelector("#favorites-container");
+  favoritesContainer.innerHTML = "";
+
+  favoriteCities.forEach((city) => {
+    const cityCard = document.createElement("div");
+    cityCard.classList.add("favorite-card");
+    cityCard.innerHTML = `
+      <div>${city.name}</div>
+      <img src="${city.icon}" alt="Weather Icon" />
+      <div>${city.temp}</div>
+    `;
+    favoritesContainer.appendChild(cityCard);
   });
 }
 
 function formatDate(date) {
-  let minutes = date.getMinutes();
-  let hours = date.getHours();
-  let days = [
+  const minutes = date.getMinutes();
+  const hours = date.getHours();
+  const days = [
     "Sunday",
     "Monday",
     "Tuesday",
@@ -112,73 +118,52 @@ function formatDate(date) {
     "Friday",
     "Saturday",
   ];
-  let day = days[date.getDay()];
-
-  if (minutes < 10) {
-    minutes = `${minutes}`;
-  }
-
-  return `${day} ${hours}:${minutes}`;
-}
-
-function searchCity(city) {
-  let apiKey = "9520o814t03ab019b07fae5815434801";
-  let apiUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
-  axios.get(apiUrl).then(refreshWeather);
-}
-
-function handleSearchSubmit(event) {
-  event.preventDefault();
-  let searchInput = document.querySelector("#search-form-input");
-
-  searchCity(searchInput.value);
-}
-
-function formatDay(timestamp) {
-  let date = new Date(timestamp * 1000);
-  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-  return days[date.getDay()];
+  const day = days[date.getDay()];
+  return `${day} ${hours}:${minutes < 10 ? `0${minutes}` : minutes}`;
 }
 
 function getForecast(city) {
-  let apiKey = "9520o814t03ab019b07fae5815434801";
-  let apiUrl = `https://api.shecodes.io/weather/v1/forecast?query=${city}&key=${apiKey}&unit=metric`;
-  axios(apiUrl).then(displayForecast);
+  const apiKey = "9520o814t03ab019b07fae5815434801";
+  const apiUrl = `https://api.shecodes.io/weather/v1/forecast?query=${city}&key=${apiKey}&unit=metric`;
+  axios.get(apiUrl).then(displayForecast);
 }
 
 function displayForecast(response) {
+  const forecastElement = document.querySelector("#forecast");
   let forecastHtml = "";
 
-  response.data.daily.forEach(function (day, index) {
+  response.data.daily.forEach((day, index) => {
     if (index < 5) {
       forecastHtml += `
         <div class="weather-forecast-day">
           <div class="weather-forecast-date">${formatDay(day.time)}</div>
           <img src="${day.condition.icon_url}" class="weather-forecast-icon" />
-          <div class="weather-forecast-temperatures">
-            <div class="weather-forecast-temperature">
-              <strong>${Math.round(day.temperature.maximum)}°</strong>
-            </div>
-            <div class="weather-forecast-temperature">
-              ${Math.round(day.temperature.minimum)}°
-            </div>
-          </div>
+          <div>${Math.round(day.temperature.maximum)}°C</div>
         </div>
       `;
     }
   });
 
-  let forecastElement = document.querySelector("#forecast");
   forecastElement.innerHTML = forecastHtml;
-
-  let description = document
-    .querySelector("#description")
-    .innerText.toLowerCase();
-  updateTextColors(description);
 }
 
-let searchFormElement = document.querySelector("#search-form");
-searchFormElement.addEventListener("submit", handleSearchSubmit);
+function formatDay(timestamp) {
+  const date = new Date(timestamp * 1000);
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return days[date.getDay()];
+}
+
+function searchCity(city) {
+  const apiKey = "9520o814t03ab019b07fae5815434801";
+  const apiUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(refreshWeather);
+}
+
+const searchFormElement = document.querySelector("#search-form");
+searchFormElement.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const searchInput = document.querySelector("#search-form-input");
+  searchCity(searchInput.value);
+});
 
 searchCity("Oslo");

@@ -9,7 +9,6 @@
       href="https://fonts.googleapis.com/css2?family=Sour+Gummy&family=Arial&display=swap"
       rel="stylesheet"
     />
-
     <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
     <title>Weather App</title>
   </head>
@@ -29,32 +28,45 @@
       </header>
 
       <main>
+        <!-- Byen og hjertet -->
+        <div class="city-and-favorite">
+          <h1 class="weather-app-city" id="city"></h1>
+          <button id="favorite-button" onclick="addFavoriteCity()">❤️</button>
+        </div>
+
+        <!-- Temperatur, ikon og værdetaljer -->
         <div class="weather-app-data">
-          <div>
-            <h1 class="weather-app-city" id="city"></h1>
-            <p class="weather-app-details">
-              <span id="time"></span>
-              <span id="description"></span>
-              <br />
-              Humidity: <strong id="humidity"></strong>, Wind:
-              <strong id="wind-speed"></strong>
-            </p>
-          </div>
-          <div class="weather-app-container">
-            <div id="icon"></div>
+          <div id="icon"></div>
+          <div class="weather-app-temperature-container">
             <div class="weather-app-temperature" id="temperature"></div>
             <div class="weather-app-unit">°C</div>
           </div>
         </div>
+
+        <!-- Værdetaljer -->
+        <p class="weather-app-details">
+          <span id="time"></span>
+          <span id="description"></span>
+          <br />
+          Humidity: <strong id="humidity"></strong>, Wind:
+          <strong id="wind-speed"></strong>
+        </p>
+
+        <!-- Værmelding -->
         <div class="weather-forecast" id="forecast"></div>
+
+        <!-- Favorittbyer -->
+        <div class="favorites-section">
+          <h2>Your Favorite Cities</h2>
+          <div id="favorites-container"></div>
+        </div>
       </main>
 
       <footer>
         This project was coded by
         <a href="https://github.com/Elinblu" target="_blank"
-          >Elin Blütecher Holter,</a
-        >
-        is
+          >Elin Blütecher Holter</a
+        >, is
         <a href="https://github.com/Elinblu/Weather-App" target="_blank"
           >open-sourced on Github</a
         >
